@@ -1,55 +1,52 @@
 ---
 format_version: 1.0.0
-default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
-
+default_step_lib_source: 'https://github.com/bitrise-io/bitrise-steplib.git'
 app:
   envs:
-  - BITRISE_PROJECT_PATH: "./ios-simple-objc/ios-simple-objc.xcodeproj"
+  - BITRISE_PROJECT_PATH: ./ios-simple-objc/ios-simple-objc.xcodeproj
     opts:
       is_expand: false
   - BITRISE_SCHEME: ios-simple-objc
     opts:
       is_expand: false
-
 trigger_map:
-- pattern: "*"
+- pattern: '*'
   is_pull_request_allowed: true
   workflow: primary
-
 workflows:
   primary:
     steps:
     - git-clone@3.0.0:
-        run_if: ".IsCI"
+        run_if: .IsCI
         outputs:
-        - GIT_CLONE_COMMIT_HASH:
+        - GIT_CLONE_COMMIT_HASH: null
           opts:
             title: Cloned git commit's commit hash
-        - GIT_CLONE_COMMIT_MESSAGE_SUBJECT:
+        - GIT_CLONE_COMMIT_MESSAGE_SUBJECT: null
           opts:
             title: Cloned git commit's message subject
-        - GIT_CLONE_COMMIT_MESSAGE_BODY:
+        - GIT_CLONE_COMMIT_MESSAGE_BODY: null
           opts:
             title: Cloned git commit's message body
-        - GIT_CLONE_COMMIT_AUTHOR_NAME:
+        - GIT_CLONE_COMMIT_AUTHOR_NAME: null
           opts:
             title: Cloned git commit's author name
-        - GIT_CLONE_COMMIT_AUTHOR_EMAIL:
+        - GIT_CLONE_COMMIT_AUTHOR_EMAIL: null
           opts:
             title: Cloned git commit's author email address
-        - GIT_CLONE_COMMIT_COMMITER_NAME:
+        - GIT_CLONE_COMMIT_COMMITER_NAME: null
           opts:
             title: Cloned git commit's committer name
-        - GIT_CLONE_COMMIT_COMMITER_EMAIL:
+        - GIT_CLONE_COMMIT_COMMITER_EMAIL: null
           opts:
             title: Cloned git commit's committer email
     - cocoapods-install@1.0.2: {}
     - certificate-and-profile-installer@1.2.0:
-        run_if: ".IsCI"
+        run_if: .IsCI
     - select-xcode-version@2.0.0:
-        run_if: ".IsCI"
+        run_if: .IsCI
         inputs:
-        - version_channel_id: "-stable"
+        - version_channel_id: '-stable'
     - xcode-test@1.3.0:
         title: 'Xcode: Unit Test'
         inputs:
@@ -59,11 +56,61 @@ workflows:
     - xcode-archive@1.2.0:
         title: 'Xcode: Create Archive'
         inputs:
-        - output_dir: "${BITRISE_DEPLOY_DIR}"
+        - output_dir: '${BITRISE_DEPLOY_DIR}'
         outputs:
-        - BITRISE_IPA_PATH:
+        - BITRISE_IPA_PATH: null
           opts:
             title: The created .ipa file's path
-        - BITRISE_DSYM_PATH:
+        - BITRISE_DSYM_PATH: null
+          opts:
+            title: The created .dSYM.zip file's path
+  test:
+    steps:
+    - git-clone@3.0.0:
+        run_if: .IsCI
+        outputs:
+        - GIT_CLONE_COMMIT_HASH: null
+          opts:
+            title: Cloned git commit's commit hash
+        - GIT_CLONE_COMMIT_MESSAGE_SUBJECT: null
+          opts:
+            title: Cloned git commit's message subject
+        - GIT_CLONE_COMMIT_MESSAGE_BODY: null
+          opts:
+            title: Cloned git commit's message body
+        - GIT_CLONE_COMMIT_AUTHOR_NAME: null
+          opts:
+            title: Cloned git commit's author name
+        - GIT_CLONE_COMMIT_AUTHOR_EMAIL: null
+          opts:
+            title: Cloned git commit's author email address
+        - GIT_CLONE_COMMIT_COMMITER_NAME: null
+          opts:
+            title: Cloned git commit's committer name
+        - GIT_CLONE_COMMIT_COMMITER_EMAIL: null
+          opts:
+            title: Cloned git commit's committer email
+    - cocoapods-install@1.0.2: {}
+    - certificate-and-profile-installer@1.2.0:
+        run_if: .IsCI
+    - select-xcode-version@2.0.0:
+        run_if: .IsCI
+        inputs:
+        - version_channel_id: '-stable'
+    - xcode-test@1.3.0:
+        title: 'Xcode: Unit Test'
+        inputs:
+        - opts:
+            is_expand: false
+          simulator_device: iPad
+    - xcode-archive@1.2.0:
+        title: 'Xcode: Create Archive'
+        inputs:
+        - output_dir: '${BITRISE_DEPLOY_DIR}'
+        outputs:
+        - BITRISE_IPA_PATH: null
+          opts:
+            title: The created .ipa file's path
+        - BITRISE_DSYM_PATH: null
           opts:
             title: The created .dSYM.zip file's path
